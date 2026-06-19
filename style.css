@@ -305,3 +305,27 @@ select:focus, input:focus {
 .tx-amount.neutral { color: var(--text-pure); }
 
 .hidden { display: none !important; }
+/* Delete Transaction Styles Addition */
+.tx-action-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-delete-tx {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 15px;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.btn-delete-tx:active {
+    color: var(--danger);
+    transform: scale(0.9);
+}
