@@ -1,15 +1,14 @@
-// Centralized state system
 let state = {
     spending: 0.00,
     savings: 0.00,
     automation: {
         amount: 0.00,
+        dayOfWeek: null,
         lastProcessed: null
     },
     transactions: []
 };
 
-// Initialize app data on launch
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     processWeeklyAutomation();
@@ -17,58 +16,67 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
 
-// Load state data safely from system localStorage
 function loadData() {
     const savedData = localStorage.getItem('apex_ledger_data');
     if (savedData) {
         try {
             state = JSON.parse(savedData);
+            // Ensure schema updates exist for older versions
+            if (!state.automation.hasOwnProperty('dayOfWeek')) {
+                state.automation.dayOfWeek = "5"; // Default to Friday
+            }
         } catch (e) {
-            console.error("Error breaking down saved payload, resetting storage structures", e);
+            console.error("Error reading storage formats, restoring structural defaults.", e);
         }
     }
 }
 
-// Save active configurations down to Local Storage arrays
 function saveData() {
     localStorage.setItem('apex_ledger_data', JSON.stringify(state));
 }
 
-// Background checking calculations to catch up on allowance automation values
+// Scans calendar dates between access windows to grant exact allowance packages
 function processWeeklyAutomation() {
-    if (state.automation.amount > 0 && state.automation.lastProcessed) {
+    if (state.automation.amount > 0 && state.automation.lastProcessed && state.automation.dayOfWeek !== null) {
         const now = new Date();
-        const lastCheck = new Date(state.automation.lastProcessed);
+        let lastCheck = new Date(state.automation.lastProcessed);
         
-        // Calculate the difference in milliseconds and translate to days
-        const timeDiff = now.getTime() - lastCheck.getTime();
-        const daysPassed = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const weeksPassed = Math.floor(daysPassed / 7);
+        // Zero hours to lock checks exclusively on calendar dates
+        now.setHours(0,0,0,0);
+        lastCheck.setHours(0,0,0,0);
 
-        if (weeksPassed > 0) {
-            const calculatedAllowance = state.automation.amount * weeksPassed;
-            state.spending += calculatedAllowance;
+        let triggerCount = 0;
+        let runningDayTracker = new Date(lastCheck);
+        
+        // Advance tracking one step forward from the last processed date
+        runningDayTracker.setDate(runningDayTracker.getDate() + 1);
+
+        while (runningDayTracker <= now) {
+            if (runningDayTracker.getDay() === parseInt(state.automation.dayOfWeek)) {
+                triggerCount++;
+            }
+            runningDayTracker.setDate(runningDayTracker.getDate() + 1);
+        }
+
+        if (triggerCount > 0) {
+            const compiledEarnings = state.automation.amount * triggerCount;
+            state.spending += compiledEarnings;
             
-            // Log the processed tracking into transaction ledger
             state.transactions.unshift({
                 id: Date.now(),
-                desc: `Automated Allowance (${weeksPassed} Wk${weeksPassed > 1 ? 's' : ''})`,
-                amount: calculatedAllowance,
+                desc: `Automated Allowance (${triggerCount} Wk${triggerCount > 1 ? 's' : ''})`,
+                amount: compiledEarnings,
                 type: 'income',
                 account: 'spending',
-                date: now.toLocaleDateString()
+                date: new Date().toLocaleDateString()
             });
 
-            // Advance the tracking stamp by exactly the weeks processed
-            lastCheck.setDate(lastCheck.getDate() + (weeksPassed * 7));
-            state.automation.lastProcessed = lastCheck.toISOString();
-            
+            state.automation.lastProcessed = now.toISOString();
             saveData();
         }
     }
 }
 
-// Render dynamic elements cleanly into view objects
 function renderUI() {
     const total = state.spending + state.savings;
     
@@ -76,17 +84,25 @@ function renderUI() {
     document.getElementById('spending-balance').textContent = formatCurrency(state.spending);
     document.getElementById('savings-balance').textContent = formatCurrency(state.savings);
 
-    // Dynamic automation labels updates
     const autoStatusText = document.getElementById('automation-status');
-    if (state.automation.amount > 0) {
-        autoStatusText.textContent = `Active: $${state.automation.amount.toFixed(2)} added weekly.`;
-        autoStatusText.style.color = 'var(--accent-green)';
+    const cancelBtn = document.getElementById('cancel-auto-btn');
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    if (state.automation.amount > 0 && state.automation.dayOfWeek !== null) {
+        const targetDayName = weekdays[parseInt(state.automation.dayOfWeek)];
+        autoStatusText.textContent = `Active: $${state.automation.amount.toFixed(2)} automatically arriving every ${targetDayName}.`;
+        autoStatusText.style.color = '#34d399';
+        cancelBtn.classList.remove('hidden');
+        
+        // Populate current options into inputs for quick reference/editing
+        document.getElementById('auto-amount').value = state.automation.amount;
+        document.getElementById('auto-day').value = state.automation.dayOfWeek;
     } else {
-        autoStatusText.textContent = 'Automation: Inactive / Off';
+        autoStatusText.textContent = 'Automation: Off';
         autoStatusText.style.color = 'var(--text-muted)';
+        cancelBtn.classList.add('hidden');
     }
 
-    // Process out histories records list templates
     const dynamicHistoryList = document.getElementById('transaction-history');
     dynamicHistoryList.innerHTML = '';
 
@@ -108,7 +124,7 @@ function renderUI() {
         li.innerHTML = `
             <div class="tx-info">
                 <h4>${escapeHTML(tx.desc)}</h4>
-                <p>${tx.date} • Account: ${tx.account}</p>
+                <p>${tx.date} • ${tx.account}</p>
             </div>
             <div class="tx-amount ${colorClass}">${sign}${formatCurrency(tx.amount)}</div>
         `;
@@ -116,9 +132,8 @@ function renderUI() {
     });
 }
 
-// Form logic helper functions
 function setupEventListeners() {
-    // Basic Deposit / Expense Log Processing
+    // Standard Manual Logging Structures
     document.getElementById('transaction-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const type = document.getElementById('tx-type').value;
@@ -127,7 +142,7 @@ function setupEventListeners() {
         const desc = document.getElementById('tx-desc').value.trim();
 
         if (type === 'expense' && state[account] < amount) {
-            alert(`Insufficient funds in your ${account} balance to execute this mock expense transaction.`);
+            alert(`Insufficient funds in your ${account} balance.`);
             return;
         }
 
@@ -148,7 +163,7 @@ function setupEventListeners() {
         e.target.reset();
     });
 
-    // Account to Account Transfer Processing Actions
+    // Vault to Vault Internal System Transfers
     document.getElementById('transfer-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const fromAcc = document.getElementById('tf-from').value;
@@ -161,7 +176,7 @@ function setupEventListeners() {
         }
 
         if (state[fromAcc] < amount) {
-            alert(`Insufficient funds in ${fromAcc} to handle this transfer.`);
+            alert(`Insufficient funds in ${fromAcc} to complete transfer.`);
             return;
         }
 
@@ -182,36 +197,54 @@ function setupEventListeners() {
         e.target.reset();
     });
 
-    // Setup Allowance Rules Configuration Processing
+    // Save or Edit Automation Rules
     document.getElementById('automation-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('auto-amount').value);
+        const day = document.getElementById('auto-day').value;
         
         if (isNaN(amount) || amount <= 0) {
-            state.automation.amount = 0;
-            state.automation.lastProcessed = null;
-            alert("Allowance Automation turned off.");
-        } else {
-            state.automation.amount = amount;
+            alert("Please provide an amount greater than zero.");
+            return;
+        }
+
+        // Apply parameters instantly without wiping bank history
+        state.automation.amount = amount;
+        state.automation.dayOfWeek = day;
+        
+        // Establish standard anchor baseline if configuring from scratch
+        if (!state.automation.lastProcessed) {
             state.automation.lastProcessed = new Date().toISOString();
-            alert(`Automation active! $${amount.toFixed(2)} will deposit to your Spending account every 7 days.`);
         }
         
+        alert("Weekly schedule updated successfully!");
         saveData();
         renderUI();
     });
 
-    // Master Clear system triggers
+    // Isolate Automation Rules and Remove Them Cleanly
+    document.getElementById('cancel-auto-btn').addEventListener('click', () => {
+        if (confirm("Are you sure you want to stop your weekly allowance automation? Your current balances will not be altered.")) {
+            state.automation.amount = 0;
+            state.automation.dayOfWeek = null;
+            state.automation.lastProcessed = null;
+            
+            document.getElementById('automation-form').reset();
+            
+            saveData();
+            renderUI();
+        }
+    });
+
     document.getElementById('clear-data-btn').addEventListener('click', () => {
-        if (confirm("Are you sure you want to clear your data? This will clear balances and transaction histories.")) {
-            state = { spending: 0, savings: 0, automation: { amount: 0, lastProcessed: null }, transactions: [] };
+        if (confirm("Master reset? This wipes your entire history and settings.")) {
+            state = { spending: 0, savings: 0, automation: { amount: 0, dayOfWeek: null, lastProcessed: null }, transactions: [] };
             saveData();
             renderUI();
         }
     });
 }
 
-// UI Tabs management logic helper switcher
 window.switchTab = function(tabName) {
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(btn => btn.classList.remove('active'));
@@ -228,11 +261,11 @@ window.switchTab = function(tabName) {
     }
 }
 
-// Utility text parsers configurations
 function formatCurrency(num) {
     return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
+// Basic security checks to handle input strings cleanly
 function escapeHTML(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
