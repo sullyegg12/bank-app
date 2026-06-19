@@ -121,14 +121,47 @@ function renderUI() {
                 <h4>${escapeHTML(tx.desc)}</h4>
                 <p>${tx.date} • ${tx.account}</p>
             </div>
-            <div class="tx-amount ${colorClass}">${sign}${formatCurrency(tx.amount)}</div>
+            <div class="tx-action-wrapper">
+                <div class="tx-amount ${colorClass}">${sign}${formatCurrency(tx.amount)}</div>
+                <button class="btn-delete-tx" onclick="deleteTransaction(${tx.id})" title="Delete Transaction">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </div>
         `;
         dynamicHistoryList.appendChild(li);
     });
 }
 
+// Reverses individual transaction values cleanly out of balances on-the-fly
+window.deleteTransaction = function(id) {
+    const index = state.transactions.findIndex(t => t.id === id);
+    if (index === -1) return;
+
+    const tx = state.transactions[index];
+
+    if (tx.type === 'income') {
+        state[tx.account] -= tx.amount;
+    } else if (tx.type === 'expense') {
+        state[tx.account] += tx.amount;
+    } else if (tx.type === 'transfer') {
+        // Handles complex internal transfer string matching structures cleanly
+        if (tx.account.includes('spending → savings')) {
+            state.spending += tx.amount;
+            state.savings -= tx.amount;
+        } else if (tx.account.includes('savings → spending')) {
+            state.savings += tx.amount;
+            state.spending -= tx.amount;
+        }
+    }
+
+    // Erase transaction entry from ledger tracking data arrays
+    state.transactions.splice(index, 1);
+    
+    saveData();
+    renderUI();
+};
+
 function setupEventListeners() {
-    // Manual Transaction Form
     document.getElementById('transaction-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const type = document.getElementById('tx-type').value;
@@ -136,7 +169,6 @@ function setupEventListeners() {
         const amount = parseFloat(document.getElementById('tx-amount').value);
         const desc = document.getElementById('tx-desc').value.trim();
 
-        // Premium Inline Feedback instead of crashing popups
         if (type === 'expense' && state[account] < amount) {
             flashButton('#transaction-form .btn-primary', 'Insufficient Funds!', 'var(--danger)');
             return;
@@ -160,7 +192,6 @@ function setupEventListeners() {
         e.target.reset();
     });
 
-    // Internal Transfers Form
     document.getElementById('transfer-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const fromAcc = document.getElementById('tf-from').value;
@@ -190,7 +221,6 @@ function setupEventListeners() {
         e.target.reset();
     });
 
-    // Save or Edit Allowance Automation (Simply changes configuration, leaves cash alone!)
     document.getElementById('automation-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('auto-amount').value);
@@ -210,7 +240,6 @@ function setupEventListeners() {
         renderUI();
     });
 
-    // Cancel / Delete Weekly Automation without touching current money pools
     document.getElementById('cancel-auto-btn').addEventListener('click', () => {
         state.automation.amount = 0;
         state.automation.dayOfWeek = null;
@@ -222,7 +251,6 @@ function setupEventListeners() {
         renderUI();
     });
 
-    // Master clear data button
     document.getElementById('clear-data-btn').addEventListener('click', () => {
         state = { spending: 0, savings: 0, automation: { amount: 0, dayOfWeek: null, lastProcessed: null }, transactions: [] };
         saveData();
@@ -230,7 +258,6 @@ function setupEventListeners() {
     });
 }
 
-// Micro-interaction helper for beautiful visual feedback
 function flashButton(selector, text, color) {
     const btn = document.querySelector(selector);
     const oldText = btn.textContent;
