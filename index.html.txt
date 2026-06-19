@@ -2,94 +2,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Athletiq</title>
-    <link rel="icon" href="Images/Athletiq-Logo.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Apex Ledger</title>
+    
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <link rel="apple-touch-icon" sizes="180x180" href="Athletiq-Icon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="My App">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <link rel="stylesheet" href="style.css"/>
-    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
-    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-solid/css/uicons-regular-solid.css">
-    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
-    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-thin-straight/css/uicons-thin-straight.css">
-    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Apex Ledger">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/fluent/180/000000/bank.png">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluent/48/000000/bank.png">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="app">
-
-        <!-- Global settings button -->
-        <button id="global-settings-btn" onclick="openSettings()">
-            <i class="fi fi-rr-settings"></i>
-        </button>
-
-        <!-- TAB CONTENT PANELS -->
-        <div id="panel-home"    class="panel active"></div>
-        <div id="panel-sports"  class="panel"></div>
-        <div id="panel-stats"   class="panel"></div>
-        <div id="panel-profile" class="panel"></div>
-
-        <!-- BOTTOM TAB BAR -->
-        <nav id="tab-bar">
-            <button class="tab-btn active" data-tab="home">
-                <i class="fi fi-rr-house-chimney"></i>
-                <span>Home</span>
-            </button>
-            <button class="tab-btn" data-tab="sports">
-                <i class="fi fi-rr-basketball"></i>
-                <span>Sports</span>
-            </button>
-            <button class="tab-btn" data-tab="stats">
-                <i class="fi fi-rr-stats"></i>
-                <span>Stats</span>
-            </button>
-            <button class="tab-btn" data-tab="profile">
-                <i class="fi fi-rr-user"></i>
-                <span>Profile</span>
-            </button>
-        </nav>
-
-        <!-- SETTINGS MODAL (must stay inside #app) -->
-        <div id="settings-overlay" class="hidden">
-            <div id="settings-box">
-                <div class="modal-header">
-                    <button id="settings-close">Done</button>
-                    <h2>Settings</h2>
-                    <span></span>
-                </div>
-                <div id="settings-body"></div>
-            </div>
+    <header class="app-header">
+        <div class="logo-area">
+            <i class="fa-solid fa-building-columns bank-logo"></i>
+            <h1>Apex Ledger</h1>
         </div>
-        <!-- MODAL: ADD GAME -->
-        <div id="modal-overlay" class="hidden">
-            <div id="modal-box">
-                <div class="modal-header">
-                    <button id="modal-cancel">Cancel</button>
-                    <h2 id="modal-title">Add Game</h2>
-                    <button id="modal-save" class="save-btn">Save</button>
-                </div>
-                <div id="modal-body"></div>
-            </div>
-        </div>
+        <span class="status-tag">Mock Mode</span>
+    </header>
 
-        <!-- MODAL: GAME DETAIL -->
-        <div id="detail-overlay" class="hidden">
-            <div id="detail-box">
-                <div class="modal-header">
-                    <button id="detail-back">← Back</button>
-                    <h2 id="detail-title">Game Detail</h2>
-                    <span></span>
-                </div>
-                <div id="detail-body"></div>
+    <main class="app-container">
+        
+        <section class="balance-grid">
+            <div class="card total-card">
+                <h3>Total Net Worth</h3>
+                <p id="total-balance">$0.00</p>
+                <i class="fa-solid fa-wallet card-bg-icon"></i>
             </div>
-        </div>
-    </div><!-- end #app -->
+            <div class="card spending-card">
+                <h3><i class="fa-solid fa-money-bill-wave"></i> Spending</h3>
+                <p id="spending-balance">$0.00</p>
+            </div>
+            <div class="card savings-card">
+                <h3><i class="fa-solid fa-piggy-bank"></i> Savings</h3>
+                <p id="savings-balance">$0.00</p>
+            </div>
+        </section>
 
-<script src="app.js"></script>
+        <section class="app-section">
+            <h2><i class="fa-solid fa-bolt"></i> Weekly Allowance Automation</h2>
+            <div class="automation-box">
+                <p class="description">Set an amount to automatically deposit into your Spending account every 7 days.</p>
+                <form id="automation-form" class="inline-form">
+                    <div class="input-group">
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="auto-amount" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Set Weekly</button>
+                </form>
+                <div id="automation-status" class="status-text">Automation: Off</div>
+            </div>
+        </section>
+
+        <section class="app-section">
+            <h2><i class="fa-solid fa-arrows-rotate"></i> New Transaction</h2>
+            
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('deposit')">Deposit / Expense</button>
+                <button class="tab-btn" onclick="switchTab('transfer')">Internal Transfer</button>
+            </div>
+
+            <form id="transaction-form" class="action-form">
+                <div class="form-group">
+                    <label for="tx-type">Transaction Type</label>
+                    <select id="tx-type" required>
+                        <option value="income">Add Money (+)</option>
+                        <option value="expense">Spend Money (-)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tx-account">Target Account</label>
+                        <select id="tx-account" required>
+                            <option value="spending">Spending</option>
+                            <option value="savings">Savings</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tx-amount">Amount</label>
+                        <div class="input-group">
+                            <span class="currency-prefix">$</span>
+                            <input type="number" id="tx-amount" placeholder="0.00" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tx-desc">Description</label>
+                    <input type="text" id="tx-desc" placeholder="e.g., Weekly Allowance, Snacks, Video Game" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Log Transaction</button>
+            </form>
+
+            <form id="transfer-form" class="action-form hidden">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tf-from">From</label>
+                        <select id="tf-from" required>
+                            <option value="spending">Spending</option>
+                            <option value="savings">Savings</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tf-to">To</label>
+                        <select id="tf-to" required>
+                            <option value="savings">Savings</option>
+                            <option value="spending">Spending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tf-amount">Transfer Amount</label>
+                    <div class="input-group">
+                        <span class="currency-prefix">$</span>
+                        <input type="number" id="tf-amount" placeholder="0.00" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Execute Transfer</button>
+            </form>
+        </section>
+
+        <section class="app-section">
+            <div class="section-header-flex">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Transaction Ledger</h2>
+                <button id="clear-data-btn" class="btn-text">Clear All Data</button>
+            </div>
+            <div class="ledger-container">
+                <ul id="transaction-history" class="history-list">
+                    </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
 </body>
 </html>
