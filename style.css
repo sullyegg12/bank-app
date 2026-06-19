@@ -1,13 +1,23 @@
 :root {
-    --bg-primary: #0a0f1d;
-    --bg-secondary: #141c32;
-    --bg-card: #1d2744;
-    --accent-blue: #3b82f6;
-    --accent-green: #10b981;
-    --accent-red: #ef4444;
-    --text-main: #f3f4f6;
-    --text-muted: #9ca3af;
-    --border-color: #2e3c63;
+    /* Premium Premium Fintech Color Palette */
+    --bg-main: #090d16;
+    --bg-surface: #131926;
+    --bg-input: #1c2436;
+    
+    /* Vibrant Account Gradients */
+    --grad-total: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);      /* Indigo to Purple */
+    --grad-spending: linear-gradient(135deg, #10b981 0%, #059669 100%);   /* Emerald Mint */
+    --grad-savings: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);    /* Electric Cyan */
+    --grad-btn: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);        /* Action Blue */
+    
+    /* Interface Accents */
+    --text-pure: #ffffff;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-color: #242f47;
+    --danger: #f43f5e;
+    
+    /* iOS Notch Padding Safety Nets */
     --safe-top: env(safe-area-inset-top, 20px);
     --safe-bottom: env(safe-area-inset-bottom, 20px);
 }
@@ -16,22 +26,25 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-main);
     color: var(--text-main);
     padding-top: var(--safe-top);
-    padding-bottom: calc(var(--safe-bottom) + 40px);
+    padding-bottom: calc(var(--safe-bottom) + 30px);
     min-height: 100vh;
 }
 
-/* Premium Header styling */
+/* Premium App Header */
 .app-header {
-    background-color: var(--bg-secondary);
-    padding: 20px;
+    background: rgba(19, 25, 38, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 20px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -44,116 +57,144 @@ body {
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .bank-logo {
-    font-size: 24px;
-    color: var(--accent-blue);
+    font-size: 22px;
+    background: var(--grad-total);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .app-header h1 {
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
+    color: var(--text-pure);
 }
 
 .status-tag {
-    background: rgba(59, 130, 246, 0.15);
-    color: var(--accent-blue);
-    padding: 4px 10px;
-    border-radius: 20px;
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    padding: 5px 12px;
+    border-radius: 30px;
     font-size: 11px;
     font-weight: 600;
-    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Container limits width on desktop but adapts to mobile screen borders */
+/* Central Content Container */
 .app-container {
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
     padding: 16px;
 }
 
-/* Balance Grid layout */
+/* Stunning Dashboard Cards Grid */
 .balance-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 14px;
     margin-bottom: 24px;
 }
 
 .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 18px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s;
 }
 
 .total-card {
     grid-column: span 2;
-    background: linear-gradient(135deg, #1d2744 0%, #172037 100%);
-    border-left: 4px solid var(--accent-blue);
+    background: var(--grad-total);
+    padding: 24px 20px;
 }
 
-.total-card h3 { color: var(--text-muted); font-size: 13px; text-transform: uppercase; margin-bottom: 4px;}
-.total-card p { font-size: 32px; font-weight: 700; color: #fff;}
+.total-card h3 { 
+    color: rgba(255, 255, 255, 0.7); 
+    font-size: 12px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.total-card p { 
+    font-size: 34px; 
+    font-weight: 800; 
+    color: var(--text-pure);
+    letter-spacing: -0.5px;
+}
 
-.spending-card { border-left: 4px solid var(--accent-green); }
-.spending-card h3, .savings-card h3 { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;}
-.spending-card p, .savings-card p { font-size: 20px; font-weight: 700;}
+.spending-card { background: var(--grad-spending); }
+.savings-card { background: var(--grad-savings); }
 
-.savings-card { border-left: 4px solid #f59e0b; }
+.spending-card h3, .savings-card h3 { 
+    font-size: 12px; 
+    color: rgba(255, 255, 255, 0.8); 
+    margin-bottom: 8px; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    font-weight: 600;
+}
+.spending-card p, .savings-card p { 
+    font-size: 22px; 
+    font-weight: 700;
+    color: var(--text-pure);
+}
 
 .card-bg-icon {
     position: absolute;
-    right: -10px;
-    bottom: -10px;
-    font-size: 70px;
-    color: rgba(255, 255, 255, 0.03);
+    right: -8px;
+    bottom: -12px;
+    font-size: 75px;
+    color: rgba(255, 255, 255, 0.08);
     pointer-events: none;
 }
 
-/* Sections layouts */
+/* App Modules Styling */
 .app-section {
-    background: var(--bg-secondary);
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 20px;
     margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .app-section h2 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-main);
+    color: var(--text-pure);
 }
 
-/* Automation Panel Box */
+/* Automation Interface Box */
 .automation-box {
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 16px;
+    padding: 16px;
 }
 .automation-box .description {
     font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    line-height: 1.5;
 }
 
-/* Forms styling */
+/* Input Fields and Select Dropdowns */
 .action-form {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
 .form-group {
@@ -169,28 +210,34 @@ body {
 }
 
 label {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-left: 2px;
 }
 
 select, input {
-    background: var(--bg-primary);
+    background: var(--bg-input);
     border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 12px;
-    border-radius: 10px;
+    color: var(--text-pure);
+    padding: 14px;
+    border-radius: 14px;
     font-size: 15px;
+    font-weight: 500;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
     width: 100%;
 }
 
 select:focus, input:focus {
-    border-color: var(--accent-blue);
+    border-color: #6366f1;
+    background: #222b3d;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
-/* Prefix setups for currency input elements */
+/* Input Group Currency Prefix */
 .input-group {
     position: relative;
     display: flex;
@@ -198,21 +245,22 @@ select:focus, input:focus {
 }
 .currency-prefix {
     position: absolute;
-    left: 12px;
+    left: 14px;
     color: var(--text-muted);
     font-size: 15px;
+    font-weight: 600;
 }
 .input-group input {
-    padding-left: 28px;
+    padding-left: 30px;
 }
 
-/* Tabs switcher styling */
+/* Glassmorphic Tab Container Switcher */
 .tab-container {
     display: flex;
-    background: var(--bg-primary);
+    background: var(--bg-input);
     padding: 4px;
-    border-radius: 10px;
-    margin-bottom: 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
     border: 1px solid var(--border-color);
 }
 .tab-btn {
@@ -220,37 +268,48 @@ select:focus, input:focus {
     background: transparent;
     border: none;
     color: var(--text-muted);
-    padding: 8px;
+    padding: 10px;
     font-size: 13px;
-    font-weight: 500;
-    border-radius: 8px;
+    font-weight: 600;
+    border-radius: 9px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 .tab-btn.active {
-    background: var(--bg-card);
-    color: var(--text-main);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    background: var(--bg-surface);
+    color: var(--text-pure);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* Buttons formatting */
+/* Dynamic Buttons */
 .btn {
     border: none;
-    border-radius: 10px;
+    border-radius: 14px;
     padding: 14px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: transform 0.1s, filter 0.2s;
+    transition: all 0.1s ease;
     width: 100%;
     text-align: center;
 }
-.btn:active { transform: scale(0.98); }
-.btn-primary { background: var(--accent-blue); color: white; }
-.btn-secondary { background: var(--border-color); color: white; }
+.btn:active { 
+    transform: scale(0.97); 
+    filter: brightness(0.9);
+}
+.btn-primary { 
+    background: var(--grad-btn); 
+    color: var(--text-pure);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+.btn-secondary { 
+    background: var(--border-color); 
+    color: var(--text-pure); 
+}
 
 .inline-form {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 8px;
 }
 .inline-form .input-group { flex: 2; }
@@ -258,11 +317,11 @@ select:focus, input:focus {
 
 .status-text {
     font-size: 12px;
-    font-weight: 500;
-    color: var(--accent-green);
+    font-weight: 600;
+    margin-top: 4px;
 }
 
-/* Ledger List display */
+/* Beautiful Ledger History Items */
 .section-header-flex {
     display: flex;
     justify-content: space-between;
@@ -273,15 +332,26 @@ select:focus, input:focus {
 .btn-text {
     background: none;
     border: none;
-    color: var(--accent-red);
+    color: var(--danger);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
+    padding: 4px 8px;
 }
 
 .ledger-container {
-    max-height: 280px;
+    max-height: 320px;
     overflow-y: auto;
+    padding-right: 2px;
+}
+
+/* Custom Scrollbar for Ledger Container */
+.ledger-container::-webkit-scrollbar {
+    width: 4px;
+}
+.ledger-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
 }
 
 .history-list {
@@ -292,24 +362,35 @@ select:focus, input:focus {
 }
 
 .history-item {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    padding: 12px;
-    border-radius: 10px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    padding: 14px;
+    border-radius: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.tx-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-.tx-info p { font-size: 11px; color: var(--text-muted); text-transform: capitalize; }
+.tx-info h4 { 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: var(--text-pure);
+    margin-bottom: 3px; 
+}
+.tx-info p { 
+    font-size: 11px; 
+    color: var(--text-muted); 
+    text-transform: capitalize; 
+}
 
 .tx-amount {
     font-weight: 700;
     font-size: 15px;
+    letter-spacing: -0.2px;
 }
-.tx-amount.positive { color: var(--accent-green); }
-.tx-amount.negative { color: var(--accent-red); }
-.tx-amount.neutral { color: var(--text-main); }
+.tx-amount.positive { color: #34d399; }
+.tx-amount.negative { color: #f43f5e; }
+.tx-amount.neutral { color: var(--text-pure); }
 
 .hidden { display: none !important; }
