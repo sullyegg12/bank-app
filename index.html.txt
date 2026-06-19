@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Athletiq</title>
+    <link rel="icon" href="Images/Athletiq-Logo.png" type="image/png">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" sizes="180x180" href="Athletiq-Icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="My App">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-solid/css/uicons-regular-solid.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-thin-straight/css/uicons-thin-straight.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- Global settings button -->
+        <button id="global-settings-btn" onclick="openSettings()">
+            <i class="fi fi-rr-settings"></i>
+        </button>
+
+        <!-- TAB CONTENT PANELS -->
+        <div id="panel-home"    class="panel active"></div>
+        <div id="panel-sports"  class="panel"></div>
+        <div id="panel-stats"   class="panel"></div>
+        <div id="panel-profile" class="panel"></div>
+
+        <!-- BOTTOM TAB BAR -->
+        <nav id="tab-bar">
+            <button class="tab-btn active" data-tab="home">
+                <i class="fi fi-rr-house-chimney"></i>
+                <span>Home</span>
+            </button>
+            <button class="tab-btn" data-tab="sports">
+                <i class="fi fi-rr-basketball"></i>
+                <span>Sports</span>
+            </button>
+            <button class="tab-btn" data-tab="stats">
+                <i class="fi fi-rr-stats"></i>
+                <span>Stats</span>
+            </button>
+            <button class="tab-btn" data-tab="profile">
+                <i class="fi fi-rr-user"></i>
+                <span>Profile</span>
+            </button>
+        </nav>
+
+        <!-- SETTINGS MODAL (must stay inside #app) -->
+        <div id="settings-overlay" class="hidden">
+            <div id="settings-box">
+                <div class="modal-header">
+                    <button id="settings-close">Done</button>
+                    <h2>Settings</h2>
+                    <span></span>
+                </div>
+                <div id="settings-body"></div>
+            </div>
+        </div>
+        <!-- MODAL: ADD GAME -->
+        <div id="modal-overlay" class="hidden">
+            <div id="modal-box">
+                <div class="modal-header">
+                    <button id="modal-cancel">Cancel</button>
+                    <h2 id="modal-title">Add Game</h2>
+                    <button id="modal-save" class="save-btn">Save</button>
+                </div>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
+        <!-- MODAL: GAME DETAIL -->
+        <div id="detail-overlay" class="hidden">
+            <div id="detail-box">
+                <div class="modal-header">
+                    <button id="detail-back">← Back</button>
+                    <h2 id="detail-title">Game Detail</h2>
+                    <span></span>
+                </div>
+                <div id="detail-body"></div>
+            </div>
+        </div>
+    </div><!-- end #app -->
+
+<script src="app.js"></script>
+</body>
+</html>
