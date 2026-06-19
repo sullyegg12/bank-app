@@ -21,9 +21,8 @@ function loadData() {
     if (savedData) {
         try {
             state = JSON.parse(savedData);
-            // Ensure schema updates exist for older versions
             if (!state.automation.hasOwnProperty('dayOfWeek')) {
-                state.automation.dayOfWeek = "5"; // Default to Friday
+                state.automation.dayOfWeek = "5"; 
             }
         } catch (e) {
             console.error("Error reading storage formats, restoring structural defaults.", e);
@@ -35,20 +34,17 @@ function saveData() {
     localStorage.setItem('apex_ledger_data', JSON.stringify(state));
 }
 
-// Scans calendar dates between access windows to grant exact allowance packages
 function processWeeklyAutomation() {
     if (state.automation.amount > 0 && state.automation.lastProcessed && state.automation.dayOfWeek !== null) {
         const now = new Date();
         let lastCheck = new Date(state.automation.lastProcessed);
         
-        // Zero hours to lock checks exclusively on calendar dates
         now.setHours(0,0,0,0);
         lastCheck.setHours(0,0,0,0);
 
         let triggerCount = 0;
         let runningDayTracker = new Date(lastCheck);
         
-        // Advance tracking one step forward from the last processed date
         runningDayTracker.setDate(runningDayTracker.getDate() + 1);
 
         while (runningDayTracker <= now) {
@@ -94,7 +90,6 @@ function renderUI() {
         autoStatusText.style.color = '#34d399';
         cancelBtn.classList.remove('hidden');
         
-        // Populate current options into inputs for quick reference/editing
         document.getElementById('auto-amount').value = state.automation.amount;
         document.getElementById('auto-day').value = state.automation.dayOfWeek;
     } else {
@@ -133,7 +128,7 @@ function renderUI() {
 }
 
 function setupEventListeners() {
-    // Standard Manual Logging Structures
+    // Manual Transaction Form
     document.getElementById('transaction-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const type = document.getElementById('tx-type').value;
@@ -141,8 +136,9 @@ function setupEventListeners() {
         const amount = parseFloat(document.getElementById('tx-amount').value);
         const desc = document.getElementById('tx-desc').value.trim();
 
+        // Premium Inline Feedback instead of crashing popups
         if (type === 'expense' && state[account] < amount) {
-            alert(`Insufficient funds in your ${account} balance.`);
+            flashButton('#transaction-form .btn-primary', 'Insufficient Funds!', 'var(--danger)');
             return;
         }
 
@@ -158,25 +154,21 @@ function setupEventListeners() {
             date: new Date().toLocaleDateString()
         });
 
+        flashButton('#transaction-form .btn-primary', 'Logged!', '#34d399');
         saveData();
         renderUI();
         e.target.reset();
     });
 
-    // Vault to Vault Internal System Transfers
+    // Internal Transfers Form
     document.getElementById('transfer-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const fromAcc = document.getElementById('tf-from').value;
         const toAcc = document.getElementById('tf-to').value;
         const amount = parseFloat(document.getElementById('tf-amount').value);
 
-        if (fromAcc === toAcc) {
-            alert("Origin and destination accounts cannot match.");
-            return;
-        }
-
-        if (state[fromAcc] < amount) {
-            alert(`Insufficient funds in ${fromAcc} to complete transfer.`);
+        if (fromAcc === toAcc || state[fromAcc] < amount) {
+            flashButton('#transfer-form .btn-primary', 'Invalid Transfer!', 'var(--danger)');
             return;
         }
 
@@ -192,57 +184,67 @@ function setupEventListeners() {
             date: new Date().toLocaleDateString()
         });
 
+        flashButton('#transfer-form .btn-primary', 'Transferred!', '#34d399');
         saveData();
         renderUI();
         e.target.reset();
     });
 
-    // Save or Edit Automation Rules
+    // Save or Edit Allowance Automation (Simply changes configuration, leaves cash alone!)
     document.getElementById('automation-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('auto-amount').value);
         const day = document.getElementById('auto-day').value;
         
-        if (isNaN(amount) || amount <= 0) {
-            alert("Please provide an amount greater than zero.");
-            return;
-        }
+        if (isNaN(amount) || amount <= 0) return;
 
-        // Apply parameters instantly without wiping bank history
         state.automation.amount = amount;
         state.automation.dayOfWeek = day;
         
-        // Establish standard anchor baseline if configuring from scratch
         if (!state.automation.lastProcessed) {
             state.automation.lastProcessed = new Date().toISOString();
         }
         
-        alert("Weekly schedule updated successfully!");
+        flashButton('#automation-form .btn-primary', 'Schedule Saved!', '#34d399');
         saveData();
         renderUI();
     });
 
-    // Isolate Automation Rules and Remove Them Cleanly
+    // Cancel / Delete Weekly Automation without touching current money pools
     document.getElementById('cancel-auto-btn').addEventListener('click', () => {
-        if (confirm("Are you sure you want to stop your weekly allowance automation? Your current balances will not be altered.")) {
-            state.automation.amount = 0;
-            state.automation.dayOfWeek = null;
-            state.automation.lastProcessed = null;
-            
-            document.getElementById('automation-form').reset();
-            
-            saveData();
-            renderUI();
-        }
+        state.automation.amount = 0;
+        state.automation.dayOfWeek = null;
+        state.automation.lastProcessed = null;
+        
+        document.getElementById('automation-form').reset();
+        
+        saveData();
+        renderUI();
     });
 
+    // Master clear data button
     document.getElementById('clear-data-btn').addEventListener('click', () => {
-        if (confirm("Master reset? This wipes your entire history and settings.")) {
-            state = { spending: 0, savings: 0, automation: { amount: 0, dayOfWeek: null, lastProcessed: null }, transactions: [] };
-            saveData();
-            renderUI();
-        }
+        state = { spending: 0, savings: 0, automation: { amount: 0, dayOfWeek: null, lastProcessed: null }, transactions: [] };
+        saveData();
+        renderUI();
     });
+}
+
+// Micro-interaction helper for beautiful visual feedback
+function flashButton(selector, text, color) {
+    const btn = document.querySelector(selector);
+    const oldText = btn.textContent;
+    const oldBg = btn.style.background;
+    
+    btn.textContent = text;
+    btn.style.background = color;
+    btn.style.pointerEvents = 'none';
+    
+    setTimeout(() => {
+        btn.textContent = oldText;
+        btn.style.background = oldBg;
+        btn.style.pointerEvents = 'auto';
+    }, 1800);
 }
 
 window.switchTab = function(tabName) {
@@ -265,7 +267,6 @@ function formatCurrency(num) {
     return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
-// Basic security checks to handle input strings cleanly
 function escapeHTML(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
